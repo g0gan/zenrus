@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Курсы валют</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #0d1832 url('https://img.freepik.com/free-photo/space-galaxy-background_23-2148991321.jpg') center center/cover no-repeat;
+      color: #bce3b0;
+      font-family: 'Arial Black', Arial, sans-serif;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .center {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+      gap: 80px;
+      text-align: center;
+      margin-top: 10vh;
+    }
+    .rate-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .big {
+      font-size: 9vw;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+    }
+    .label {
+      font-size: 1.2vw;
+      margin-top: 12px;
+      opacity: 0.6;
+    }
+    .eur-add {
+      font-size: 0.9vw;
+      margin-top: 4px;
+      opacity: 0.5;
+      letter-spacing: 0.04em;
+    }
+    @media (max-width: 800px) {
+      .center { flex-direction: column; gap: 40px; }
+      .big { font-size: 16vw; }
+      .label, .eur-add { font-size: 3vw; }
+    }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div class="rate-block">
+      <div id="usd" class="big">...</div>
+      <div class="label">рублей за доллар</div>
+    </div>
+    <div class="rate-block">
+      <div id="eur" class="big">...</div>
+      <div class="label">рублей за евро</div>
+      <div id="eurusd" class="eur-add"></div>
+    </div>
+    <div class="rate-block">
+      <div id="brent" class="big">...</div>
+      <div class="label">долларов за баррель</div>
+      <div id="rubbrent" class="eur-add"></div>
+    </div>
+  </div>
+  <script>
+    async function updateRates() {
+      try {
+        // Курсы валют с ЦБ РФ
+        const cbr = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
+        const usd = cbr.Valute.USD.Value;
+        const eur = cbr.Valute.EUR.Value;
+
+        document.getElementById('usd').textContent = usd.toFixed(2).replace('.', ',');
+        document.getElementById('eur').textContent = eur.toFixed(2).replace('.', ',');
+        document.getElementById('eurusd').textContent = `EUR/USD: ${(eur/usd).toFixed(2)}`;
+
+        // Цена Brent (можно брать с другого источника или захардкодить для примера)
+        const brent = await fetch('https://api.allorigins.win/get?url=https://api.coindesk.com/v1/bpi/currentprice.json')
+          .then(r=>r.json())
+          .then(_=> 78.88) // Замените на актуальный метод получения цены или значение
+
+        document.getElementById('brent').textContent = brent.toFixed(2).replace('.', ',');
+        document.getElementById('rubbrent').textContent = `${Math.round(brent * usd)} рублей за баррель`;
+      } catch {
+        document.getElementById('usd').textContent = 'N/A';
+        document.getElementById('eur').textContent = 'N/A';
+        document.getElementById('eurusd').textContent = '';
+        document.getElementById('brent').textContent = 'N/A';
+        document.getElementById('rubbrent').textContent = '';
+      }
+    }
+
+    updateRates();
+    setInterval(updateRates, 5000);
+  </script>
+</body>
+</html>
