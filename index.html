@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
-      height: 100%;
       margin: 0;
       background: #0d1832 url('https://github.com/g0gan/zenrus/blob/main/unsplash.jpg?raw=true') center center/cover no-repeat;
       color: #bce3b0;
@@ -14,38 +13,48 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
+
+      /* добавленные свойства для центрирования */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+
     .center {
       display: flex;
       flex-direction: row;
       justify-content: center;
-      align-items: flex-start;
-      height: 100vh;
+      align-items: center; /* было flex-start */
       gap: 80px;
       text-align: center;
-      margin-top: 10vh;
+      /* margin-top удалён */
     }
+
     .rate-block {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     .big {
       font-size: 9vw;
       font-weight: bold;
       letter-spacing: 0.06em;
     }
+
     .label {
       font-size: 1.2vw;
       margin-top: 12px;
       opacity: 0.6;
     }
+
     .eur-add {
       font-size: 0.9vw;
       margin-top: 4px;
       opacity: 0.5;
       letter-spacing: 0.04em;
     }
+
     @media (max-width: 800px) {
       .center { flex-direction: column; gap: 40px; }
       .big { font-size: 16vw; }
@@ -70,22 +79,23 @@
       <div id="rubbrent" class="eur-add"></div>
     </div>
   </div>
+
   <script>
     async function updateRates() {
       try {
-        // Курсы валют с ЦБ РФ
+        // Курсы валют с ЦБ РФ Daily
         const cbr = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
         const usd = cbr.Valute.USD.Value;
         const eur = cbr.Valute.EUR.Value;
 
         document.getElementById('usd').textContent = usd.toFixed(2).replace('.', ',');
         document.getElementById('eur').textContent = eur.toFixed(2).replace('.', ',');
-        document.getElementById('eurusd').textContent = `EUR/USD: ${(eur/usd).toFixed(2)}`;
+        document.getElementById('eurusd').textContent = `EUR/USD: ${(eur / usd).toFixed(2)}`;
 
-        // Цена Brent (можно брать с другого источника или захардкодить для примера)
+        // Цена Brent — можно заменить на актуальный источник
         const brent = await fetch('https://api.allorigins.win/get?url=https://api.coindesk.com/v1/bpi/currentprice.json')
-          .then(r=>r.json())
-          .then(_=> 78.88) // Замените на актуальный метод получения цены или значение
+          .then(r => r.json())
+          .then(_ => 78.88); // заглушка — замените на реальное значение, если необходимо
 
         document.getElementById('brent').textContent = brent.toFixed(2).replace('.', ',');
         document.getElementById('rubbrent').textContent = `${Math.round(brent * usd)} рублей за баррель`;
@@ -99,7 +109,7 @@
     }
 
     updateRates();
-    setInterval(updateRates, 5000);
+    setInterval(updateRates, 5000); // можно поставить 1000 для обновления каждую секунду
   </script>
 </body>
 </html>
